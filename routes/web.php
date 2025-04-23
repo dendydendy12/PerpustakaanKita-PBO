@@ -1,17 +1,20 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FrontController;
-
 
 Route::get('/', function () {
-    return view('.front.index');
+    return view('welcome');
 });
 
-Route::get('/about', function () {
-    return view('.front.about');
-});
-Route::get('/book', [FrontController::class, 'book']);
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::post('/peminjaman', [FrontController::class, 'store'])->name('peminjaman');
-Route::put('/pengembalian/{id}', [FrontController::class, 'returnBook'])->name('pengembalian');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
