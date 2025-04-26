@@ -27,7 +27,7 @@
         @enderror
       </div>
 
-      <div class="mb-4 form-control">
+      <div class="mb-2 form-control">
         <label class="label" for="password">
           <span class="label-text">Kata Sandi</span>
         </label>
@@ -35,6 +35,12 @@
         @error('password')
           <span class="mt-1 text-sm text-red-500">{{ $message }}</span>
         @enderror
+      </div>
+
+      <div class="mb-4 text-right">
+        @if (Route::has('password.request'))
+          <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">Lupa kata sandi?</a>
+        @endif
       </div>
 
       <div class="mb-4 form-control">

@@ -1,25 +1,49 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lupa Kata Sandi - Perpustakaan Digital</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.8.0/dist/full.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-base-200">
+
+  <div class="w-full max-w-sm p-6 bg-white shadow-lg rounded-2xl">
+    <div class="mb-6 text-center">
+      <h1 class="text-3xl font-bold text-primary">Lupa Kata Sandi</h1>
+      <p class="text-sm text-gray-500">Masukkan email untuk mengatur ulang kata sandi kamu.</p>
     </div>
 
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    @if (session('status'))
+      <div class="mb-4 text-sm text-green-600">
+        {{ session('status') }}
+      </div>
+    @endif
 
     <form method="POST" action="{{ route('password.email') }}">
-        @csrf
+      @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+      <div class="mb-4 form-control">
+        <label class="label" for="email">
+          <span class="label-text">Email</span>
+        </label>
+        <input type="email" id="email" name="email" value="{{ old('email') }}" class="w-full input input-bordered" required autofocus />
+        @error('email')
+          <span class="mt-1 text-sm text-red-500">{{ $message }}</span>
+        @enderror
+      </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+      <button type="submit" class="w-full btn btn-primary">
+        Kirim Link Reset Kata Sandi
+      </button>
+
+      <p class="mt-4 text-sm text-center">
+        Ingat kata sandi? <a href="{{ route('login') }}" class="link link-primary">Masuk sekarang</a>
+      </p>
     </form>
-</x-guest-layout>
+  </div>
+
+</body>
+</html>
