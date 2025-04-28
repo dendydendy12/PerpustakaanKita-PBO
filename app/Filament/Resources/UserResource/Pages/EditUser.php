@@ -16,4 +16,14 @@ class EditUser extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+{
+    if (isset($data['password'])) {
+        $data['password'] = bcrypt($data['password']);
+    }
+
+    return $data;
+}
+
 }
