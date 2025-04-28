@@ -1,141 +1,117 @@
-<x-front.layout>
-    <!DOCTYPE html>
-    <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Digital Library SMK Al Hafidz</title>
-        <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: 'Poppins', sans-serif; background-color: #f5f5f5; color: #333; }
-            .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-            .collection-header { text-align: center; padding: 30px; background: #510EFA; color: white; border-radius: 10px; margin-bottom: 20px; }
-            .book-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 20px;
-                justify-content: center;
-            }
-            .book-card {
-                background: white;
-                padding: 15px;
-                border-radius: 10px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                text-align: center;
-                transition: transform 0.3s ease;
-            }
-            .book-card:hover { transform: translateY(-5px); }
-            .book-cover {
-                height: 250px;
-                background-size: cover;
-                background-position: center;
-                border-radius: 10px;
-                margin-bottom: 10px;
-                position: relative;
-            }
-            .stock-badge {
-                position: absolute;
-                top: 5px;
-                right: 5px;
-                background: #4CAF50;
-                color: white;
-                padding: 3px 7px;
-                border-radius: 10px;
-                font-size: 0.8rem;
-            }
-            .book-title { font-size: 1rem; color: #510EFA; margin-bottom: 5px; }
-            .book-author { font-size: 0.9rem; color: #777; margin-bottom: 10px; }
-            .book-category { font-size: 0.85rem; color: #555; margin-bottom: 10px; font-weight: bold; }
-            .btn { background: #510EFA; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; transition: background 0.3s ease; }
-            .btn:hover { background: #3e0bbf; }
-            .modal {
-                display: none;
-                position: fixed;
-                top: 0; left: 0;
-                width: 100%; height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                justify-content: center;
-                align-items: center;
-                z-index: 1000;
-            }
-            .modal-content { background: white; padding: 20px; border-radius: 10px; text-align: center; }
-            .close-btn { font-size: 1.5rem; cursor: pointer; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <section class="collection-header">
-                <h1>Digital Library SMK Al Hafidz</h1>
-                <p>Temukan dan pinjam buku favorit Anda secara online</p>
-            </section>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Library SMK Al Hafidz</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.8.0/dist/full.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
 
-            <div class="book-grid">
-                @forelse ($bukus as $buku)
-                <div class="book-card">
-                    <div class="book-cover" style="background-image: url('{{ Storage::url($buku->cover) }}')">
-                        <span class="stock-badge">Stok: {{ $buku->stok_buku }}</span>
+    <!-- Navbar -->
+    <div class="navbar bg-white shadow-md sticky top-0 z-50">
+        <div class="navbar-start">
+            <a href="{{ route('dashboard') }}" class="flex items-center">
+                <img src="{{ asset('assets/images/logo/smk.png') }}" alt="Logo SMK" class="h-10 w-10 mr-3">
+                <span class="text-xl font-bold text-blue-700">Digital Library</span>
+            </a>
+        </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="{{ route('dashboard') }}" class="hover:text-blue-600">Beranda</a></li>
+                <li><a href="{{ route('book') }}" class="hover:text-blue-600">Buku</a></li>
+                <li><a href="{{ route('peminjaman') }}" class="hover:text-blue-600">Pinjamanku</a></li>
+                <li><a href="{{ route('profile.edit') }}" class="hover:text-blue-600">Profil</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn btn-error btn-sm">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <section class="text-center mt-20 mb-8 px-4">
+        <h1 class="text-4xl font-bold text-blue-700">Koleksi Buku</h1>
+        <p class="text-gray-500 mt-2">Temukan dan pinjam buku favorit Anda secara online</p>
+    </section>
+
+    <!-- Book Grid -->
+    <div class="container mx-auto px-6 mb-16">
+        <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            @forelse ($bukus as $buku)
+                <div class="card bg-white shadow-md hover:shadow-xl transition rounded-xl">
+                    <figure>
+                        <img src="{{ Storage::url($buku->cover) }}" alt="{{ $buku->judul }}" class="h-60 w-full object-cover rounded-t-xl">
+                    </figure>
+                    <div class="card-body">
+                        <h2 class="card-title text-blue-700 text-lg">{{ Str::limit($buku->judul, 40) }}</h2>
+                        <p class="text-sm text-gray-500">{{ Str::limit($buku->penulis, 30) }}</p>
+                        <p class="text-sm font-semibold text-gray-600 mt-2">
+                            Kategori: {{ $buku->kategori->nama_kategori ?? '-' }}
+                        </p>
+                        <div class="badge badge-success mt-2">Stok: {{ $buku->stok_buku }}</div>
+
+                        <div class="card-actions justify-end mt-4">
+                            @if($buku->stok_buku > 0 && !$buku->status_pinjaman)
+                                <button class="btn btn-primary btn-sm" onclick="openModal({{ $buku->id }}, '{{ $buku->judul }}', '{{ $buku->penulis }}')">Pinjam</button>
+                            @endif
+                            @if($buku->status_pinjaman)
+                                <form action="{{ route('pengembalian', $buku->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="btn btn-error btn-sm">Kembalikan</button>
+                                </form>
+                            @endif
+                        </div>
                     </div>
-                    <h3 class="book-title">{{ Str::limit($buku->judul, 50) }}</h3>
-                    <p class="book-author">{{ Str::limit($buku->penulis, 30) }}</p>
-                    <p class="book-category">Kategori: {{ $buku->kategori_id }}</p>
-                    @if($buku->stok_buku > 0)
-                        <button class="btn" onclick="openModal({{ $buku->id }}, '{{ $buku->judul }}', '{{ $buku->penulis }}')">Pinjam Buku</button>
-                    @endif
-                    @if($buku->status_pinjaman)
-                        <form action="{{ route('pengembalian', $buku->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <button class="btn" style="background: red;" type="submit">Kembalikan</button>
-                        </form>
-                    @endif
                 </div>
-                @empty
-                <p>Belum ada buku</p>
-                @endforelse
-            </div>
+            @empty
+                <p class="col-span-4 text-center text-gray-500">Belum ada buku tersedia.</p>
+            @endforelse
         </div>
+    </div>
 
-        <!-- Modal Peminjaman -->
-        <div id="pinjamModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal()">&times;</span>
-                <h2>Form Peminjaman Buku</h2>
-                <form id="loanForm" method="POST" action="{{ route('peminjaman') }}">
-                    @csrf
-                    <input type="hidden" name="buku_id" id="buku_id">
-                    <p id="modalJudul"></p>
-                    <p id="modalPenulis"></p>
-                    <label>Tanggal Pengembalian:</label>
-                    <input type="date" name="tanggal_kembali" required>
-                    <button class="btn" type="submit">Konfirmasi Peminjaman</button>
-                </form>
+    <!-- Modal -->
+    <div id="pinjamModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+        <div class="bg-white p-6 rounded-lg w-96">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Form Peminjaman Buku</h2>
+                <button onclick="closeModal()" class="text-2xl leading-none">&times;</button>
             </div>
+            <form id="loanForm" method="POST" action="{{ route('peminjaman') }}">
+                @csrf
+                <input type="hidden" name="buku_id" id="buku_id">
+                <div class="mb-2">
+                    <p id="modalJudul" class="font-semibold"></p>
+                    <p id="modalPenulis" class="text-gray-500"></p>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-1 text-gray-700">Tanggal Pengembalian</label>
+                    <input type="date" name="tanggal_kembali" class="input input-bordered w-full" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Konfirmasi</button>
+            </form>
         </div>
+    </div>
 
-        <div class="join">
-            <input
-              class="join-item btn btn-square"
-              type="radio"
-              name="options"
-              aria-label="1"
-              checked="checked" />
-            <input class="join-item btn btn-square" type="radio" name="options" aria-label="2" />
-            <input class="join-item btn btn-square" type="radio" name="options" aria-label="3" />
-            <input class="join-item btn btn-square" type="radio" name="options" aria-label="4" />
-          </div>
+    <!-- Modal Scripts -->
+    <script>
+        function openModal(id, title, author) {
+            document.getElementById('buku_id').value = id;
+            document.getElementById('modalJudul').textContent = `Judul: ${title}`;
+            document.getElementById('modalPenulis').textContent = `Penulis: ${author}`;
+            document.getElementById('pinjamModal').classList.remove('hidden');
+            document.getElementById('pinjamModal').classList.add('flex');
+        }
+        function closeModal() {
+            document.getElementById('pinjamModal').classList.add('hidden');
+            document.getElementById('pinjamModal').classList.remove('flex');
+        }
+    </script>
 
-        <script>
-            function openModal(id, title, author) {
-                document.getElementById('buku_id').value = id;
-                document.getElementById('modalJudul').textContent = `Judul: ${title}`;
-                document.getElementById('modalPenulis').textContent = `Penulis: ${author}`;
-                document.getElementById('pinjamModal').style.display = 'flex';
-            }
-
-            function closeModal() {
-                document.getElementById('pinjamModal').style.display = 'none';
-            }
-        </script>
-    </body>
-    </html>
-</x-front.layout>
+</body>
+</html>
